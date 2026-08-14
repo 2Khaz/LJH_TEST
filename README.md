@@ -59,7 +59,7 @@ Firebase 설정값이 없어도 개발 서버는 실행되지만, 기록 저장/
    - `VITE_FIREBASE_STORAGE_BUCKET`
    - `VITE_FIREBASE_MESSAGING_SENDER_ID`
    - `VITE_FIREBASE_APP_ID`
-3. `main` 브랜치에 푸시하면 자동 배포되며, 완료 후 `https://2khaz.github.io/ljh_test/` 에서 접속할 수 있습니다.
+3. `main` 브랜치에 푸시하면 자동 배포되며, 완료 후 `https://2khaz.github.io/LJH_TEST/` 에서 접속할 수 있습니다.
 
 ## 구조
 

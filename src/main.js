@@ -21,12 +21,14 @@ const nicknameInput = document.querySelector('[data-role="nickname-input"]');
 const saveButton = document.querySelector('[data-role="save-button"]');
 const saveStatusEl = document.querySelector('[data-role="save-status"]');
 const retryButton = document.querySelector('[data-role="retry-button"]');
+const rankingEl = document.querySelector('[data-role="ranking"]');
 const rankingListEl = document.querySelector('[data-role="ranking-list"]');
 
 let state = 'idle';
 let timerId = null;
 let signalStartAt = 0;
 let lastMeasuredMs = 0;
+let rankingRenderToken = 0;
 
 function setState(next) {
   state = next;
@@ -51,6 +53,8 @@ function showIdle() {
   nicknameInput.value = '';
   nicknameForm.reset();
   saveButton.disabled = false;
+  rankingEl.hidden = false;
+  renderRanking();
 }
 
 function startGame() {
@@ -58,6 +62,7 @@ function startGame() {
   hideHitZone();
   startButton.hidden = true;
   resultEl.hidden = true;
+  rankingEl.hidden = true;
   enterWaiting(MIN_DELAY_MS, MAX_DELAY_MS);
 }
 
@@ -114,6 +119,8 @@ function handleEarlyClick() {
   startButton.hidden = false;
   startButton.textContent = '다시 시작';
   resultEl.hidden = true;
+  rankingEl.hidden = false;
+  renderRanking();
 }
 
 function handleTrapClick() {
@@ -123,6 +130,8 @@ function handleTrapClick() {
   startButton.hidden = false;
   startButton.textContent = '다시 시작';
   resultEl.hidden = true;
+  rankingEl.hidden = false;
+  renderRanking();
 }
 
 async function handleReactionClick() {
@@ -137,18 +146,28 @@ async function handleReactionClick() {
   saveStatusEl.textContent = '';
   nicknameInput.value = '';
   saveButton.disabled = false;
+  rankingEl.hidden = false;
   await renderRanking();
 }
 
 async function renderRanking() {
-  rankingListEl.innerHTML = '';
+  const token = ++rankingRenderToken;
   let topScores = [];
+  let errorMessage = null;
   try {
     topScores = await getTop(RANKING_SIZE);
   } catch (error) {
+    errorMessage = '랭킹을 불러오지 못했습니다.';
+  }
+
+  if (token !== rankingRenderToken) return;
+
+  rankingListEl.innerHTML = '';
+
+  if (errorMessage) {
     const li = document.createElement('li');
     li.className = 'ranking-empty';
-    li.textContent = '랭킹을 불러오지 못했습니다.';
+    li.textContent = errorMessage;
     rankingListEl.appendChild(li);
     return;
   }

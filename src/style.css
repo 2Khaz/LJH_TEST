@@ -10,6 +10,7 @@ body {
 }
 
 #app {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -17,6 +18,17 @@ body {
   transition: background-color 0.15s ease;
   cursor: pointer;
   padding: 24px;
+  overflow: hidden;
+}
+
+.hit-zone {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 16px;
+  background-color: #dc2626;
+  box-shadow: 0 0 24px rgba(220, 38, 38, 0.7);
+  z-index: 2;
 }
 
 .panel {
@@ -126,4 +138,16 @@ body {
 
 .screen--fail {
   background-color: #7c2d12;
+}
+
+.screen--decoy {
+  background-color: #f97316;
+}
+
+.screen--partial-ready {
+  background-color: #1d4ed8;
+}
+
+.screen--trapfail {
+  background-color: #6d28d9;
 }

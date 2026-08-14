@@ -3,9 +3,15 @@ import { saveScore, getTop } from './scores.js';
 
 const MIN_DELAY_MS = 1000;
 const MAX_DELAY_MS = 12000;
+const RETRY_MIN_DELAY_MS = 500;
+const RETRY_MAX_DELAY_MS = 4000;
+const DECOY_DURATION_MS = 700;
+const DECOY_CHANCE = 0.3;
+const PARTIAL_CHANCE = 0.3;
 const RANKING_SIZE = 10;
 
 const app = document.getElementById('app');
+const hitZoneEl = document.querySelector('[data-role="hit-zone"]');
 const messageEl = document.querySelector('[data-role="message"]');
 const startButton = document.querySelector('[data-role="start-button"]');
 const resultEl = document.querySelector('[data-role="result"]');
@@ -19,7 +25,7 @@ const rankingListEl = document.querySelector('[data-role="ranking-list"]');
 
 let state = 'idle';
 let timerId = null;
-let redStartAt = 0;
+let signalStartAt = 0;
 let lastMeasuredMs = 0;
 
 function setState(next) {
@@ -27,10 +33,18 @@ function setState(next) {
   app.className = `screen screen--${next}`;
 }
 
+function hideHitZone() {
+  hitZoneEl.hidden = true;
+}
+
 function showIdle() {
+  clearTimeout(timerId);
+  hideHitZone();
   setState('idle');
   messageEl.innerHTML =
-    '버튼을 누르면 게임이 시작됩니다.<br />화면이 <strong>빨간색</strong>으로 바뀌면 최대한 빨리 클릭하세요!';
+    '버튼을 누르면 게임이 시작됩니다.<br />' +
+    '화면이 <strong>빨간색</strong>으로 바뀌면 최대한 빨리 클릭하세요!<br />' +
+    '단, 가끔 <strong>주황색 가짜 신호</strong>가 나오거나 <strong>화면 일부에만</strong> 신호가 나타날 수 있어요!';
   startButton.hidden = false;
   startButton.textContent = '시작하기';
   resultEl.hidden = true;
@@ -42,30 +56,80 @@ function showIdle() {
 
 function startGame() {
   clearTimeout(timerId);
-  setState('waiting');
-  messageEl.textContent = '곧 화면이 빨간색으로 바뀝니다. 기다리세요...';
+  hideHitZone();
   startButton.hidden = true;
   resultEl.hidden = true;
+  enterWaiting(MIN_DELAY_MS, MAX_DELAY_MS);
+}
 
-  const delay = MIN_DELAY_MS + Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS);
+function enterWaiting(minDelay, maxDelay) {
+  setState('waiting');
+  messageEl.textContent = '곧 신호가 나타납니다. 기다리세요...';
+  const delay = minDelay + Math.random() * (maxDelay - minDelay);
+  timerId = setTimeout(triggerSignal, delay);
+}
+
+function triggerSignal() {
+  const roll = Math.random();
+  if (roll < DECOY_CHANCE) {
+    showDecoy();
+  } else if (roll < DECOY_CHANCE + PARTIAL_CHANCE) {
+    showPartialReady();
+  } else {
+    showReady();
+  }
+}
+
+function showReady() {
+  setState('ready');
+  messageEl.textContent = '지금 클릭하세요!';
+  signalStartAt = performance.now();
+}
+
+function showDecoy() {
+  setState('decoy');
+  messageEl.textContent = '지금 클릭하세요!';
   timerId = setTimeout(() => {
-    setState('ready');
-    messageEl.textContent = '지금 클릭하세요!';
-    redStartAt = performance.now();
-  }, delay);
+    if (state === 'decoy') {
+      enterWaiting(RETRY_MIN_DELAY_MS, RETRY_MAX_DELAY_MS);
+    }
+  }, DECOY_DURATION_MS);
+}
+
+function showPartialReady() {
+  setState('partial-ready');
+  messageEl.textContent = '빨간 부분을 찾아 클릭하세요!';
+  const left = 10 + Math.random() * 70;
+  const top = 15 + Math.random() * 60;
+  hitZoneEl.style.left = `${left}%`;
+  hitZoneEl.style.top = `${top}%`;
+  hitZoneEl.hidden = false;
+  signalStartAt = performance.now();
 }
 
 function handleEarlyClick() {
   clearTimeout(timerId);
+  hideHitZone();
   setState('fail');
-  messageEl.innerHTML = '너무 빨리 눌렀습니다!<br />빨간색으로 바뀔 때까지 기다려주세요.';
+  messageEl.innerHTML = '너무 빨리 눌렀습니다!<br />신호가 나타날 때까지 기다려주세요.';
+  startButton.hidden = false;
+  startButton.textContent = '다시 시작';
+  resultEl.hidden = true;
+}
+
+function handleTrapClick() {
+  clearTimeout(timerId);
+  setState('trapfail');
+  messageEl.innerHTML = '낚이셨습니다!<br />빨간색이 아니라 주황색 가짜 신호였어요.';
   startButton.hidden = false;
   startButton.textContent = '다시 시작';
   resultEl.hidden = true;
 }
 
 async function handleReactionClick() {
-  lastMeasuredMs = Math.round(performance.now() - redStartAt);
+  clearTimeout(timerId);
+  hideHitZone();
+  lastMeasuredMs = Math.round(performance.now() - signalStartAt);
   setState('result');
   messageEl.textContent = '결과';
   startButton.hidden = true;
@@ -111,6 +175,12 @@ app.addEventListener('click', (event) => {
     handleEarlyClick();
   } else if (state === 'ready') {
     handleReactionClick();
+  } else if (state === 'decoy') {
+    handleTrapClick();
+  } else if (state === 'partial-ready') {
+    if (event.target.closest('[data-role="hit-zone"]')) {
+      handleReactionClick();
+    }
   }
 });
 

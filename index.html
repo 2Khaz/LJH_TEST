@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>반응속도 측정기</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app" class="screen screen--idle">
+      <div class="panel">
+        <h1>반응속도 측정기</h1>
+        <p class="message" data-role="message">
+          버튼을 누르면 게임이 시작됩니다.<br />
+          화면이 <strong>빨간색</strong>으로 바뀌면 최대한 빨리 클릭하세요!
+        </p>
+        <button type="button" class="action-button" data-role="start-button">시작하기</button>
+
+        <div class="result" data-role="result" hidden>
+          <p class="result-time" data-role="result-time"></p>
+          <form class="nickname-form" data-role="nickname-form">
+            <input
+              type="text"
+              class="nickname-input"
+              data-role="nickname-input"
+              placeholder="닉네임을 입력하세요"
+              maxlength="10"
+              required
+            />
+            <button type="submit" class="action-button" data-role="save-button">기록 저장</button>
+          </form>
+          <p class="save-status" data-role="save-status"></p>
+        </div>
+
+        <div class="ranking" data-role="ranking">
+          <h2>최고 기록 랭킹</h2>
+          <ol class="ranking-list" data-role="ranking-list"></ol>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

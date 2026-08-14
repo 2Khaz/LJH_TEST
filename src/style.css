@@ -101,10 +101,27 @@ body {
   padding: 16px 20px;
 }
 
-.ranking h2 {
+.ranking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ranking-header h2 {
   font-size: 1rem;
-  margin: 0 0 10px;
-  text-align: center;
+  margin: 0;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
 }
 
 .ranking-list {
@@ -121,6 +138,51 @@ body {
   text-align: center;
   opacity: 0.8;
   list-style: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 24px;
+}
+
+.modal {
+  background: #1f2430;
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-header .action-button {
+  font-size: 0.9rem;
+  padding: 6px 16px;
+}
+
+.ranking-list--full {
+  font-size: 0.95rem;
 }
 
 /* 상태별 배경색 */

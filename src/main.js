@@ -9,6 +9,7 @@ const DECOY_DURATION_MS = 700;
 const DECOY_CHANCE = 0.3;
 const PARTIAL_CHANCE = 0.3;
 const RANKING_SIZE = 10;
+const FULL_RANKING_SIZE = 100;
 
 const app = document.getElementById('app');
 const hitZoneEl = document.querySelector('[data-role="hit-zone"]');
@@ -23,6 +24,10 @@ const saveStatusEl = document.querySelector('[data-role="save-status"]');
 const retryButton = document.querySelector('[data-role="retry-button"]');
 const rankingEl = document.querySelector('[data-role="ranking"]');
 const rankingListEl = document.querySelector('[data-role="ranking-list"]');
+const fullRankingButton = document.querySelector('[data-role="full-ranking-button"]');
+const fullRankingOverlay = document.querySelector('[data-role="full-ranking-overlay"]');
+const fullRankingListEl = document.querySelector('[data-role="full-ranking-list"]');
+const fullRankingCloseButton = document.querySelector('[data-role="full-ranking-close"]');
 
 let state = 'idle';
 let timerId = null;
@@ -150,6 +155,32 @@ async function handleReactionClick() {
   await renderRanking();
 }
 
+function renderScoreList(listEl, topScores, errorMessage) {
+  listEl.innerHTML = '';
+
+  if (errorMessage) {
+    const li = document.createElement('li');
+    li.className = 'ranking-empty';
+    li.textContent = errorMessage;
+    listEl.appendChild(li);
+    return;
+  }
+
+  if (topScores.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'ranking-empty';
+    li.textContent = '아직 기록이 없습니다.';
+    listEl.appendChild(li);
+    return;
+  }
+
+  topScores.forEach((score, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${index + 1}. ${score.nickname} - ${score.ms} ms`;
+    listEl.appendChild(li);
+  });
+}
+
 async function renderRanking() {
   const token = ++rankingRenderToken;
   let topScores = [];
@@ -161,31 +192,45 @@ async function renderRanking() {
   }
 
   if (token !== rankingRenderToken) return;
-
-  rankingListEl.innerHTML = '';
-
-  if (errorMessage) {
-    const li = document.createElement('li');
-    li.className = 'ranking-empty';
-    li.textContent = errorMessage;
-    rankingListEl.appendChild(li);
-    return;
-  }
-
-  if (topScores.length === 0) {
-    const li = document.createElement('li');
-    li.className = 'ranking-empty';
-    li.textContent = '아직 기록이 없습니다.';
-    rankingListEl.appendChild(li);
-    return;
-  }
-
-  for (const score of topScores) {
-    const li = document.createElement('li');
-    li.textContent = `${score.nickname} - ${score.ms} ms`;
-    rankingListEl.appendChild(li);
-  }
+  renderScoreList(rankingListEl, topScores, errorMessage);
 }
+
+let fullRankingRenderToken = 0;
+
+async function openFullRanking() {
+  fullRankingOverlay.hidden = false;
+  const token = ++fullRankingRenderToken;
+  fullRankingListEl.innerHTML = '<li class="ranking-empty">불러오는 중...</li>';
+
+  let topScores = [];
+  let errorMessage = null;
+  try {
+    topScores = await getTop(FULL_RANKING_SIZE);
+  } catch (error) {
+    errorMessage = '랭킹을 불러오지 못했습니다.';
+  }
+
+  if (token !== fullRankingRenderToken) return;
+  renderScoreList(fullRankingListEl, topScores, errorMessage);
+}
+
+function closeFullRanking() {
+  fullRankingOverlay.hidden = true;
+}
+
+fullRankingButton.addEventListener('click', () => {
+  openFullRanking();
+});
+
+fullRankingCloseButton.addEventListener('click', () => {
+  closeFullRanking();
+});
+
+fullRankingOverlay.addEventListener('click', (event) => {
+  if (event.target === fullRankingOverlay) {
+    closeFullRanking();
+  }
+});
 
 app.addEventListener('click', (event) => {
   if (state === 'waiting') {

@@ -35,8 +35,21 @@
         </div>
 
         <div class="ranking" data-role="ranking">
-          <h2>최고 기록 랭킹</h2>
+          <div class="ranking-header">
+            <h2>최고 기록 랭킹</h2>
+            <button type="button" class="link-button" data-role="full-ranking-button">전체 랭킹 보기</button>
+          </div>
           <ol class="ranking-list" data-role="ranking-list"></ol>
+        </div>
+      </div>
+
+      <div class="modal-overlay" data-role="full-ranking-overlay" hidden>
+        <div class="modal">
+          <div class="modal-header">
+            <h2>전체 랭킹</h2>
+            <button type="button" class="action-button" data-role="full-ranking-close">닫기</button>
+          </div>
+          <ol class="ranking-list ranking-list--full" data-role="full-ranking-list"></ol>
         </div>
       </div>
     </div>

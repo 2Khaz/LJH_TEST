@@ -43,8 +43,7 @@ function showIdle() {
   setState('idle');
   messageEl.innerHTML =
     '버튼을 누르면 게임이 시작됩니다.<br />' +
-    '화면이 <strong>빨간색</strong>으로 바뀌면 최대한 빨리 클릭하세요!<br />' +
-    '단, 가끔 <strong>주황색 가짜 신호</strong>가 나오거나 <strong>화면 일부에만</strong> 신호가 나타날 수 있어요!';
+    '화면이 <strong>빨간색</strong>으로 바뀌면 최대한 빨리 클릭하세요!';
   startButton.hidden = false;
   startButton.textContent = '시작하기';
   resultEl.hidden = true;

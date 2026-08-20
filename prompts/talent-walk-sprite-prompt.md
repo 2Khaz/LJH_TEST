@@ -34,24 +34,25 @@
 - 전신에 랜덤한 크기의 원형 반점(이끼/얼룩) 텍스처 유지
 - 아트 스타일: 플랫 셰이딩 카툰풍, 두꺼운 검은 외곽선, 단순 그림자, 모바일 게임 몬스터 아이콘 스타일 (레퍼런스와 완전히 동일한 스타일 유지)
 
-동작: '중후한(묵직한) 걷기' 사이클
-- 골렘 특유의 느리고 무거운 보폭, 한 걸음마다 땅을 짓누르는 듯한 무게감
+동작: '다리를 크게 굽히지 않는 중후한 앞뒤 걷기' 사이클
+- 무릎을 거의 굽히지 않고, 다리 전체가 엉덩이 관절을 축으로 진자(pendulum)처럼 뻣뻣하게 앞뒤로 오가는 걸음
+- 쭈그리거나 무릎을 접어 웅크리는 동작 없이, 다리를 편 상태 그대로 앞으로 크게 내딛고 뒤로 쭉 뻗음
+- 보폭은 크고 느리며, 다리를 곧게 편 채 이동하기 때문에 절도 있고 위엄 있는 인상
 - 큰 쪽 팔은 거의 흔들리지 않고 묵직하게 아래로 늘어진 채 이동, 작은 쪽 팔만 절제된 폭으로 스윙
 - 상체(머리~몸통)는 크게 출렁이지 않고, 둔중하게 살짝만 상하로 움직임
-- 걸음마다 착지 시 무게 중심이 쿵 하고 내려앉는 듯한 느낌의 포즈 강조
-- 급하거나 가벼운 느낌 절대 금지 — 크고 무겁고 위압적인 인상 유지
+- 급하거나 가볍거나 무릎을 깊이 굽히는 느낌 절대 금지 — 곧은 다리로 무게감 있게 걷는 인상 유지
 
 시점: 완전 측면(side-view, 2D 게임용), 오른쪽을 향해 걷는 방향
 
-프레임 구성 (8프레임 걷기 사이클, 대칭 구조):
-1. Contact — 앞발 착지, 몸 전체가 가장 낮게 짓눌린 자세
-2. Down/Recoil — 착지 충격이 흡수되는 순간, 무게가 가장 낮은 지점
-3. Passing — 다리가 교차하는 중간 자세, 신체가 가장 높은 지점
-4. Up — 다음 착지를 준비하며 살짝 상승
-5. Contact — 반대발 착지 (1번의 좌우 반전)
-6. Down/Recoil (2번의 좌우 반전)
+프레임 구성 (8프레임 걷기 사이클, 대칭 구조 — 무릎을 굽히지 않는 곧은 다리 진자 걸음):
+1. Extreme A — 앞다리(오른다리)를 무릎 편 채 앞으로 크게 내딛고, 뒷다리(왼다리)는 무릎 편 채 뒤로 쭉 뻗은 자세 (다리 벌어짐 최대)
+2. Contact A — 앞다리가 착지하며 체중이 실리는 순간, 다리는 여전히 편 상태 유지 (무릎 굽힘 없음)
+3. Passing — 두 다리가 몸 중심 아래에서 스쳐 지나가는 자세, 다리는 거의 수직으로 편 상태 유지 (다리를 접지 않고 곧게 편 채로 진자처럼 통과)
+4. Transition — 왼다리가 앞으로, 오른다리가 뒤로 이동하며 전환되는 중간 자세
+5. Extreme B — 왼다리를 앞으로, 오른다리를 뒤로 (1번의 좌우 반전)
+6. Contact B (2번의 좌우 반전)
 7. Passing (3번의 좌우 반전)
-8. Up (4번의 좌우 반전)
+8. Transition (4번의 좌우 반전)
 
 기술 사양:
 - 프레임 크기: 128x128px (여백 포함), 캐릭터 실제 높이는 프레임의 약 80%
@@ -66,7 +67,8 @@
 - 배경 오브젝트, 그림자, 워터마크, 텍스트 삽입 금지
 - 잘린 팔다리, 여분의 팔다리/손가락 금지
 - 모션 블러, 잔상 효과 금지
-- 가볍고 빠른 걸음걸이 금지 — 반드시 무겁고 둔중한 골렘 특유의 걸음걸이 유지
+- 무릎을 크게 굽히거나 쭈그려 앉는 듯한 자세 금지 (다리는 항상 편 상태 유지)
+- 가볍고 빠른 걸음걸이 금지 — 반드시 무겁고 절도 있는 골렘 특유의 걸음걸이 유지
 
 출력: 위 8프레임을 하나의 스프라이트 시트 이미지(가로 1024x128px, 128px 그리드)로 배치해서 생성.
 ```
@@ -84,9 +86,11 @@ tattered purple ragged vest with jagged hem, asymmetric arms
 with jagged hem, gray stone legs, blunt four-toed bare feet,
 thick black outlines, simple flat shading, no background shadow.
 
-Animation keywords: heavy lumbering golem walk cycle, slow ponderous stomping gait,
+Animation keywords: heavy dignified golem walk cycle, stiff straight-leg pendulum walk,
+legs swing rigidly from the hip joint with almost no knee bend, no crouching or squatting,
+legs stay fully extended while stepping forward and backward, slow stately marching-like gait,
 minimal torso bounce, oversized arm barely swinging, small arm restrained swing,
-weighty ground-pounding footsteps, side view facing right,
+weighty deliberate footsteps, side view facing right,
 8-frame walking animation, horizontal sprite strip, 128x128px per frame,
 transparent background, flat consistent lighting, no motion blur,
 consistent proportions and asymmetry across all frames, keep character design
@@ -95,6 +99,7 @@ identical to the attached reference image.
 Negative prompt: blurry, motion blur, inconsistent character design,
 different color palette, different spot pattern, symmetric arms,
 extra limbs, cropped body, watermark, text, background scenery, drop shadow,
+deep knee bend, crouching walk, squatting pose, bent-knee running stride,
 fast/light/bouncy walk, running pose, front-facing pose, photorealistic, 3D render.
 ```
 
@@ -106,7 +111,7 @@ fast/light/bouncy walk, running pose, front-facing pose, photorealistic, 3D rend
 2. **한 번에 전체 시트 요청**: 8프레임을 개별로 나눠 요청하면 매 프레임마다 반점 위치나 팔 비율이 미세하게 달라집니다. "8프레임을 한 장의 그리드 이미지로" 라고 명시해 한 번의 생성 호출로 처리하세요.
 3. **비대칭 팔 강조**: 골렘 캐릭터의 핵심 특징인 좌우 비대칭 팔(한쪽만 크고 근육질)이 걷기 동작 중에도 항상 같은 쪽에 유지되도록 프롬프트에서 반복 강조하세요. 이 부분이 가장 깨지기 쉬운 디테일입니다.
 4. **후처리 검수**: 생성된 시트는 Aseprite, Photoshop 등으로 128px 그리드 기준 슬라이스 후, 특히 3번(Passing)/7번 프레임에서 팔 비대칭이 반대로 뒤집히지 않았는지, 반점 패턴이 유지됐는지 확인하세요.
-5. **재생성 시 참고 문구**: 걸음걸이가 너무 가볍거나 빨라 보이면 "더 느리고 무겁게, 땅을 짓누르는 듯한 골렘 특유의 걸음걸이로"라고 재요청 문구를 덧붙이세요.
+5. **재생성 시 참고 문구**: 무릎이 굽혀지거나 쭈그리는 자세로 나오면 "다리를 편 상태로 유지하고, 무릎을 굽히지 말고 엉덩이 관절부터 진자처럼 앞뒤로 크게 뻗는 걸음으로"라고 재요청 문구를 덧붙이세요.
 6. **애니메이션 검수**: 슬라이스한 프레임을 6~8fps로 재생해 확인하세요. 골렘의 '중후함'을 살리려면 일반 캐릭터보다 낮은 프레임레이트(6fps 권장)가 더 무게감 있게 보입니다.
 
 ---
@@ -132,10 +137,20 @@ MANUS는 자율적으로 이미지 생성 도구를 호출하고, 결과를 스�
 
 2단계. 걷기 사이클 스프라이트 시트 생성
 - 1단계에서 확정한 캐릭터를 기준으로, 아래 사양의 8프레임 걷기 사이클을 "한 장의 그리드 이미지"로 생성한다.
-  - 동작: 골렘 특유의 느리고 무거운 걸음걸이. 큰 팔은 거의 흔들지 않고, 작은 팔만 절제된 폭으로 스윙.
-    상체 출렁임 최소화, 착지 시 무게감이 느껴지는 포즈 강조. 가볍거나 빠른 인상 절대 금지.
+  - 동작: 무릎을 거의 굽히지 않고, 다리 전체가 엉덩이 관절을 축으로 진자처럼 뻣뻣하게 앞뒤로 크게 오가는 걸음.
+    쭈그리거나 무릎을 접어 웅크리는 동작 없이 다리를 편 채 앞/뒤로 크게 내딛는다.
+    큰 팔은 거의 흔들지 않고, 작은 팔만 절제된 폭으로 스윙. 상체 출렁임 최소화.
+    가볍거나 빠른 인상, 무릎을 깊게 굽히는 인상 절대 금지 — 곧은 다리로 무게감 있게 걷는 인상.
   - 시점: 완전 측면, 오른쪽을 향해 걷는 방향
-  - 프레임: Contact → Down/Recoil → Passing → Up → (반대발) Contact → Down/Recoil → Passing → Up (8프레임, 좌우 대칭 사이클)
+  - 프레임 (8프레임, 좌우 대칭 사이클, 다리는 항상 편 상태 유지):
+    1. Extreme A — 앞다리 무릎 편 채 앞으로 크게 내딛고, 뒷다리 무릎 편 채 뒤로 쭉 뻗음 (다리 벌어짐 최대)
+    2. Contact A — 앞다리 착지, 체중 이동, 다리는 계속 편 상태
+    3. Passing — 두 다리가 몸 중심 아래서 스치는 자세, 다리는 거의 수직으로 편 상태 유지 (무릎 굽힘 없이 진자처럼 통과)
+    4. Transition — 반대 다리가 앞으로, 원래 앞다리가 뒤로 이동하는 전환 자세
+    5. Extreme B — (1번 좌우 반전)
+    6. Contact B — (2번 좌우 반전)
+    7. Passing — (3번 좌우 반전)
+    8. Transition — (4번 좌우 반전)
   - 레이아웃: 가로 1행 x 8열, 프레임당 128x128px, 총 1024x128px
   - 배경: 완전 투명(PNG, alpha channel), 그림자 없음
   - 프레임 전체에서 반점 패턴/팔 비대칭/색상이 흔들리지 않고 동일하게 유지
@@ -146,6 +161,7 @@ MANUS는 자율적으로 이미지 생성 도구를 호출하고, 결과를 스�
   - 팔 비대칭 방향이 8프레임 내내 동일한 쪽으로 유지되는가 (반전 오류 없는가)
   - 반점/텍스처 패턴이 프레임마다 크게 달라지지 않았는가
   - 배경이 완전히 투명한가, 그림자나 워터마크가 없는가
+  - 모든 프레임에서 다리가 편 상태를 유지하는가 (무릎이 깊게 굽혀지거나 쭈그린 자세가 나오면 재생성)
   - 걸음걸이가 무겁고 느린 인상인가 (가볍거나 빠르게 보이면 재생성)
   - 잘린 팔다리나 여분의 손가락/팔다리가 없는가
 
@@ -157,6 +173,7 @@ MANUS는 자율적으로 이미지 생성 도구를 호출하고, 결과를 스�
 
 [완료 기준]
 - 8프레임 전체에서 캐릭터 디자인(반점, 비대칭 팔, 눈, 의상)이 원본 레퍼런스와 동일할 것
+- 모든 프레임에서 다리가 무릎을 깊게 굽히지 않고 편 상태로 앞뒤로 크게 오갈 것 (쭈그리거나 웅크리는 자세 금지)
 - 걸음걸이가 무겁고 위압적인 '중후한' 인상일 것 (가볍거나 발랄한 느낌이면 실패로 간주하고 재작업)
 - 배경 완전 투명, 프레임 간 캐릭터 크기/앵커 동일
 - 1~4단계를 스스로 검수하며 통과할 때까지 반복한 뒤 최종본만 제출할 것

@@ -59,6 +59,7 @@
 - 시트 레이아웃: 가로 1행 x 8열 스프라이트 스트립, 각 프레임 동일 앵커/스케일
 - 배경: 완전 투명(PNG, alpha channel)
 - 조명/그림자: 레퍼런스와 동일하게 그림자 없는 플랫 셰이딩, 모든 프레임 동일한 광원 각도
+- 외곽선: 첨부 레퍼런스 이미지와 동일한 두께/색상의 검정 외곽선 유지 (얇아지거나 흐려지거나 끊기지 않게)
 - 프레임 간 캐릭터 비율/텍스처/색상/비대칭 팔 구조 완전히 동일하게 유지 (일관성 최우선)
 
 금지 사항 (Negative):
@@ -68,6 +69,7 @@
 - 잘린 팔다리, 여분의 팔다리/손가락 금지
 - 모션 블러, 잔상 효과 금지
 - 무릎을 크게 굽히거나 쭈그려 앉는 듯한 자세 금지 (다리는 항상 편 상태 유지)
+- 외곽선이 원본보다 얇아지거나, 흐려지거나, 이중선/끊긴 선으로 나오는 것 금지
 - 가볍고 빠른 걸음걸이 금지 — 반드시 무겁고 절도 있는 골렘 특유의 걸음걸이 유지
 
 출력: 위 8프레임을 하나의 스프라이트 시트 이미지(가로 1024x128px, 128px 그리드)로 배치해서 생성.
@@ -94,13 +96,15 @@ weighty deliberate footsteps, side view facing right,
 8-frame walking animation, horizontal sprite strip, 128x128px per frame,
 transparent background, flat consistent lighting, no motion blur,
 consistent proportions and asymmetry across all frames, keep character design
-identical to the attached reference image.
+identical to the attached reference image, keep the same thick black outline
+weight and style as the reference image on every frame.
 
 Negative prompt: blurry, motion blur, inconsistent character design,
 different color palette, different spot pattern, symmetric arms,
 extra limbs, cropped body, watermark, text, background scenery, drop shadow,
 deep knee bend, crouching walk, squatting pose, bent-knee running stride,
-fast/light/bouncy walk, running pose, front-facing pose, photorealistic, 3D render.
+fast/light/bouncy walk, running pose, front-facing pose, photorealistic, 3D render,
+thin outline, faded outline, broken outline, double outline.
 ```
 
 ---
@@ -165,7 +169,17 @@ MANUS는 자율적으로 이미지 생성 도구를 호출하고, 결과를 스�
   - 걸음걸이가 무겁고 느린 인상인가 (가볍거나 빠르게 보이면 재생성)
   - 잘린 팔다리나 여분의 손가락/팔다리가 없는가
 
-4단계. 최종 산출물 정리
+4단계. 외곽선 보정
+- 3단계를 통과한 8프레임 각각을, 첨부한 원본 레퍼런스 이미지의 외곽선과 직접 대조한다.
+- 대조 항목: (a) 외곽선 두께(레퍼런스와 동일한 두께인지, 얇아지거나 두꺼워지지 않았는지),
+  (b) 외곽선 색상(순수 검정인지, 회색/보라 톤으로 흐려지지 않았는지),
+  (c) 외곽선이 끊기거나 이중선으로 겹쳐 그려진 부분이 없는지,
+  (d) 관절/실루엣 경계마다 외곽선이 빠짐없이 그려졌는지(팔-몸통 경계, 다리-몸통 경계 등)
+- 하나라도 원본과 다르면, 원본 레퍼런스의 외곽선 스타일을 기준으로 해당 프레임의 외곽선만 다시 그리거나
+  전체를 재생성해서 8프레임 전부 원본과 동일한 외곽선 두께/스타일로 통일한다.
+- 이 단계를 통과할 때까지 반복한다.
+
+5단계. 최종 산출물 정리
 - 통과된 최종 스프라이트 시트 1장(1024x128px, PNG, 투명 배경)을 결과물로 제출한다.
 - 파일명: talent_walk_cycle_8f_128.png
 - 만약 슬라이스된 개별 프레임(8장, 128x128px 각각)도 요구되면 별도로 함께 제출한다.
@@ -175,6 +189,7 @@ MANUS는 자율적으로 이미지 생성 도구를 호출하고, 결과를 스�
 - 8프레임 전체에서 캐릭터 디자인(반점, 비대칭 팔, 눈, 의상)이 원본 레퍼런스와 동일할 것
 - 모든 프레임에서 다리가 무릎을 깊게 굽히지 않고 편 상태로 앞뒤로 크게 오갈 것 (쭈그리거나 웅크리는 자세 금지)
 - 걸음걸이가 무겁고 위압적인 '중후한' 인상일 것 (가볍거나 발랄한 느낌이면 실패로 간주하고 재작업)
+- 8프레임 전체의 외곽선 두께/색상/스타일이 원본 레퍼런스와 동일할 것 (흐려지거나 끊기거나 이중선이면 실패로 간주)
 - 배경 완전 투명, 프레임 간 캐릭터 크기/앵커 동일
-- 1~4단계를 스스로 검수하며 통과할 때까지 반복한 뒤 최종본만 제출할 것
+- 1~5단계를 스스로 검수하며 통과할 때까지 반복한 뒤 최종본만 제출할 것
 ```
